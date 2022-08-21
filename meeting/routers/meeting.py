@@ -4,18 +4,22 @@ from .. import schemas, database, models
 from sqlalchemy.orm import Session
 
 
-router = APIRouter()
+router = APIRouter(
+prefix= "/meeting",
+tags=["meetings"]
+
+)
 get_db=database.get_db
 
 
 
-@router.get("/meeting", response_model=List[schemas.ShowMeeting], tags=["meetings"])
+@router.get("/", response_model=List[schemas.ShowMeeting])
 def all(db: Session = Depends(database.get_db)):
     meetings = db.query(models.Meeting).all()
     return meetings
 
 
-@router.post("/meeting", status_code=status.HTTP_201_CREATED, tags=["meetings"])
+@router.post("/", status_code=status.HTTP_201_CREATED)
 def create(request: schemas.Meeting, db: Session = Depends(get_db)):
     # return db
     new_meeting = models.Meeting(title=request.title, body=request.body, user_id=1)
@@ -25,7 +29,7 @@ def create(request: schemas.Meeting, db: Session = Depends(get_db)):
     return new_meeting
 
 
-@router.delete("/meeting/{id}", status_code=status.HTTP_204_NO_CONTENT, tags=["meetings"])
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def destroy(id, db: Session = Depends(get_db)):
     meeting=db.query(models.Meeting).filter(models.Meeting.id == id)
     if not meeting.first():
@@ -35,7 +39,7 @@ def destroy(id, db: Session = Depends(get_db)):
     return "meeting deleted"
 
 
-@router.put("/meeting/{id}", status_code=status.HTTP_202_ACCEPTED, tags=["meetings"])
+@router.put("/{id}", status_code=status.HTTP_202_ACCEPTED)
 def update(id, request: schemas.Meeting, db: Session = Depends(get_db)):
     meeting=db.query(models.Meeting).filter(models.Meeting.id == id)
     if not meeting.first():
@@ -46,7 +50,7 @@ def update(id, request: schemas.Meeting, db: Session = Depends(get_db)):
 
 
 
-@router.get("/meeting/{id}", status_code=200, response_model=schemas.ShowMeeting, tags=["meetings"])
+@router.get("/{id}", status_code=200, response_model=schemas.ShowMeeting)
 def show(id, db: Session = Depends(get_db)):
     meeting = db.query(models.Meeting).filter(models.Meeting.id == id).first()
     if not meeting:
