@@ -1,15 +1,26 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status, Request
 from . import models
 from .database import engine
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 
-from .routers import meeting, user
+from .routers import meeting, user, authentication
 #from passlib.context import CryptContext
 
 app = FastAPI()
 
+templates= Jinja2Templates(directory="templates")
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
 models.Base.metadata.create_all(engine)
 
+
+@app.get("/", status_code=status.HTTP_201_CREATED, tags=["home_page"])
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+app.include_router(authentication.router)
 app.include_router(meeting.router)
 app.include_router(user.router)
 

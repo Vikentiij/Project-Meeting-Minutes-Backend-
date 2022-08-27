@@ -3,5 +3,8 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class Hash():
     def bcrypt(password: str):
-        hashedPassword = pwd_context.hash(password)     # return pwd_context.hash(request.password)
-        return hashedPassword
+        hashed_password = pwd_context.hash(password)     # return pwd_context.hash(request.password) return pwd_cxt.hash(password)
+        return hashed_password
+    
+    def verify(hashed_password, plain_password):
+        return pwd_context.verify(plain_password, hashed_password)
